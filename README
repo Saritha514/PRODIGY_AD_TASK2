@@ -1,4 +1,4 @@
-✅ Pro To-Do – Task Management Web Application
+✅ Pro To-Do – Task Management Android Application
 📌 Project Overview
 
 Pro To-Do is a modern, responsive, and user-friendly web-based task management application developed using HTML, CSS, and JavaScript. This application helps users organize their daily tasks efficiently by allowing them to add, edit, complete, filter, and delete tasks.
@@ -6,3 +6,53 @@ Pro To-Do is a modern, responsive, and user-friendly web-based task management a
 The project was developed as part of my internship to strengthen my front-end development skills and gain practical experience in building interactive web applications.
 
 The app also supports dark mode, local storage, and real-time task statistics, making it suitable for daily productivity management.
+
+🎯 Objectives
+
+The main objectives of this project are:
+
+To create a professional and responsive to-do list application
+
+To implement task management features using JavaScript
+
+To practice DOM manipulation and event handling
+
+To store user data locally using browser storage
+
+To improve UI/UX design skills
+
+To build a real-world productivity tool
+
+✨ Features
+
+➕ Add new tasks using keyboard input
+
+✏️ Edit existing tasks
+
+✅ Mark tasks as completed or pending
+
+🗑️ Delete tasks with confirmation
+
+🌙 Light/Dark mode toggle
+
+📒 Task filtering (All / Pending / Completed)
+
+📊 Real-time task statistics
+
+💾 Data persistence using Local Storage
+
+📱 Fully responsive design
+
+🎨 Modern and professional UI
+
+🛠️ Technologies Used
+
+Frontend: HTML5, CSS3, JavaScript (Vanilla JS)
+
+Icons: Unicons Icon Library
+
+Storage: Browser Local Storage
+
+Styling: Custom CSS with Variables & Animations
+
+Environment: Web Browser
