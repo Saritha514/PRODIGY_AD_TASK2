@@ -1,1 +1,281 @@
 # PRODIGY_AD_TASK2
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro To-Do</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --border: #ecf0f1;
+            --shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        [data-theme="dark"] {
+            --card-bg: #2c3e50;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --border: #34495e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            min-height: 100vh; 
+            background: var(--bg-primary); 
+            padding: 20px; 
+            transition: all 0.3s ease;
+        }
+        .app-container { max-width: 500px; margin: 0 auto; }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            color: white; 
+        }
+        .header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 1.1rem; }
+        .theme-toggle { 
+            position: absolute; top: 20px; right: 20px; 
+            background: rgba(255,255,255,0.2); color: white; 
+            border: none; border-radius: 50%; width: 50px; height: 50px; 
+            cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s;
+        }
+        .theme-toggle:hover { transform: scale(1.1); background: rgba(255,255,255,0.3); }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 32px; 
+            box-shadow: var(--shadow); 
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-2px); }
+        .input-group { position: relative; margin-bottom: 24px; }
+        .input-group input { 
+            width: 100%; height: 56px; padding: 0 24px 0 60px; 
+            font-size: 18px; border: 2px solid var(--border); 
+            border-radius: 16px; background: transparent; 
+            color: var(--text-primary); outline: none; 
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(52,152,219,0.1); }
+        .input-group input::placeholder { color: var(--text-secondary); }
+        .input-group i { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 20px; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 24px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stats span { color: var(--text-secondary); }
+        .stats .pending { color: var(--warning); }
+        .stats .completed { color: var(--success); }
+        .filters { display: flex; gap: 12px; margin-bottom: 24px; }
+        .filter-btn { 
+            flex: 1; padding: 12px 20px; border: 2px solid var(--border); 
+            background: transparent; border-radius: 12px; cursor: pointer; 
+            font-weight: 600; transition: all 0.3s ease; color: var(--text-primary);
+        }
+        .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .task-list { max-height: 500px; overflow-y: auto; list-style: none; }
+        .task-list::-webkit-scrollbar { width: 6px; }
+        .task-list::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
+        .task-list::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 10px; }
+        .task-item { 
+            display: flex; align-items: center; padding: 20px; 
+            margin-bottom: 16px; background: rgba(52,152,219,0.05); 
+            border-radius: 16px; transition: all 0.3s ease; cursor: pointer;
+            position: relative; overflow: hidden;
+        }
+        .task-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); transform: scaleY(0); transition: transform 0.3s ease; }
+        .task-item:hover::before { transform: scaleY(1); }
+        .task-item:hover { background: rgba(52,152,219,0.1); transform: translateX(4px); }
+        .task-checkbox { width: 24px; height: 24px; margin-right: 16px; accent-color: var(--accent); transform: scale(1.2); cursor: pointer; }
+        .task-text { flex: 1; font-size: 16px; color: var(--text-primary); }
+        .task-text.completed { text-decoration: line-through; opacity: 0.6; }
+        .task-actions { display: flex; gap: 8px; opacity: 0; transition: opacity 0.3s ease; }
+        .task-item:hover .task-actions { opacity: 1; }
+        .action-btn { 
+            width: 40px; height: 40px; border: none; border-radius: 12px; 
+            cursor: pointer; font-size: 16px; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .edit-btn { background: var(--accent); color: white; }
+        .edit-btn:hover { background: #2980b9; transform: scale(1.05); }
+        .delete-btn { background: var(--danger); color: white; }
+        .delete-btn:hover { background: #c0392b; transform: scale(1.05); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state i { font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block; }
+        @media (max-width: 600px) { body { padding: 10px; } .card { padding: 24px; } }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="uil uil-moon"></i></button>
+    <div class="app-container">
+        <div class="header">
+            <h1>Pro To-Do</h1>
+            <p>Organize your tasks professionally</p>
+        </div>
+        <div class="card">
+            <div class="input-group">
+                <i class="uil uil-plus-circle"></i>
+                <input type="text" id="taskInput" placeholder="Add a new task... (Enter to add)" autocomplete="off">
+            </div>
+            <div class="stats">
+                <span>Total: <span id="total">0</span></span>
+                <span class="pending">Pending: <span id="pending">0</span></span>
+                <span class="completed">Completed: <span id="completed">0</span></span>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            <ul class="task-list" id="taskList"></ul>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="uil uil-clipboard-notes"></i>
+                <h3>No tasks yet</h3>
+                <p>Add your first task above!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+        const emptyState = document.getElementById('emptyState');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const totalSpan = document.getElementById('total');
+        const pendingSpan = document.getElementById('pending');
+        const completedSpan = document.getElementById('completed');
+        
+        let todos = JSON.parse(localStorage.getItem('pro-todos')) || [];
+        let editId = -1;
+        let currentFilter = 'all';
+
+        // Load tasks
+        function renderTasks(filter = 'all') {
+            currentFilter = filter;
+            let filteredTodos = todos.filter(todo => filter === 'all' || todo.status === filter);
+            
+            taskList.innerHTML = filteredTodos.map((todo, index) => `
+                <li class="task-item" data-id="${todo.id}">
+                    <input type="checkbox" class="task-checkbox" ${todo.status === 'completed' ? 'checked' : ''} onchange="toggleTask(${todo.id})">
+                    <span class="task-text ${todo.status === 'completed' ? 'completed' : ''}">${escapeHtml(todo.text)}</span>
+                    <div class="task-actions">
+                        <button class="action-btn edit-btn" onclick="editTask(${todo.id})" title="Edit">
+                            <i class="uil uil-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteTask(${todo.id})" title="Delete">
+                            <i class="uil uil-trash-alt"></i>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+            
+            updateStats();
+            emptyState.style.display = filteredTodos.length === 0 ? 'block' : 'none';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function addTask(text) {
+            const newTask = {
+                id: Date.now(),
+                text: text.trim(),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            todos.unshift(newTask);
+            saveTodos();
+            renderTasks(currentFilter);
+        }
+
+        function toggleTask(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.status = todo.status === 'pending' ? 'completed' : 'pending';
+                saveTodos();
+                renderTasks(currentFilter);
+            }
+        }
+
+        function editTask(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                taskInput.value = todo.text;
+                taskInput.focus();
+                editId = id;
+            }
+        }
+
+        function deleteTask(id) {
+            if (confirm('Delete this task?')) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos();
+                renderTasks(currentFilter);
+            }
+        }
+
+        function saveTodos() {
+            localStorage.setItem('to-dos', JSON.stringify(todos));
+        }
+
+        function updateStats() {
+            totalSpan.textContent = todos.length;
+            pendingSpan.textContent = todos.filter(t => t.status === 'pending').length;
+            completedSpan.textContent = todos.filter(t => t.status === 'completed').length;
+        }
+
+        function toggleTheme() {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? '' : 'dark';
+            localStorage.setItem('theme', document.body.dataset.theme);
+        }
+
+        // Event listeners
+        taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && taskInput.value.trim()) {
+                if (editId !== -1) {
+                    const todo = todos.find(t => t.id === editId);
+                    if (todo) todo.text = taskInput.value.trim();
+                    editId = -1;
+                } else {
+                    addTask(taskInput.value);
+                }
+                taskInput.value = '';
+            }
+        });
+
+        taskInput.addEventListener('blur', () => {
+            if (editId !== -1) editId = -1;
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderTasks(btn.dataset.filter);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') taskInput.blur();
+        });
+
+        // Init
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.dataset.theme = 'dark';
+            document.querySelector('.theme-toggle i').className = 'uil uil-sun';
+        } else {
+            document.querySelector('.theme-toggle i').className = 'uil uil-moon';
+        }
+        renderTasks('all');
+    </script>
+</body>
+</html>
